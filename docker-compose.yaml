@@ -1,0 +1,31 @@
+volumes:
+  postgres_data:
+services:
+  web:
+    build: ./app
+    env_file:
+      - .env
+    volumes:
+      - ./app/:/app/
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+    develop:
+      watch:
+        - action: sync
+          path: .
+          target: ./app
+          ignore:
+            - ./app/.venv/
+        - action: rebuild
+          path: ./app/uv.lock
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=devuser
+      - POSTGRES_PASSWORD=devpass
+    env_file:
+      - .env
