@@ -24,8 +24,8 @@ class AudioCodecSerializer(serializers.ModelSerializer):
 class MediaFileSerializer(serializers.ModelSerializer):
     item = serializers.CharField()
     wrapper = serializers.CharField()
-    videocodec = serializers.CharField()
-    audiocodec = serializers.CharField()
+    videocodec = serializers.CharField(allow_blank=True, required=False)
+    audiocodec = serializers.CharField(allow_blank=True, required=False)
 
     def create(self, validated_data):
         item_data = validated_data.pop('item')
@@ -50,4 +50,4 @@ class MediaFileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MediaFile
-        fields = ["item", "type", "filepath", "wrapper", "videocodec", "audiocodec"]
+        fields = ["pk", "item", "type", "filepath", "wrapper", "videocodec", "audiocodec", "width", "height"]

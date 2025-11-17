@@ -39,6 +39,8 @@ class MediaFile(models.Model):
     wrapper = models.ForeignKey(Wrapper, on_delete=models.SET_NULL, null=True, blank=True)
     videocodec = models.ForeignKey(VideoCodec, on_delete=models.SET_NULL, null=True, blank=True)
     audiocodec = models.ForeignKey(AudioCodec, on_delete=models.SET_NULL, null=True, blank=True)
+    width = models.IntegerField(null=True, blank=True)
+    height = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.filepath
