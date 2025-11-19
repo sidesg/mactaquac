@@ -4,22 +4,7 @@ from .models import *
 class ItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = Item
-        fields = ["identifier"]
-
-class WrapperSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Wrapper
-        fields = ["name"]
-
-class VideoCodecSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = VideoCodec
-        fields = ["name"]
-
-class AudioCodecSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = AudioCodec
-        fields = ["name"]
+        fields = ["identifier", "title", "collection", "updated"]
 
 class MediaFileSerializer(serializers.ModelSerializer):
     item = serializers.CharField()
@@ -50,4 +35,4 @@ class MediaFileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = MediaFile
-        fields = ["pk", "item", "type", "filepath", "wrapper", "videocodec", "audiocodec", "width", "height"]
+        fields = ["pk", "filename", "item", "type", "filepath", "wrapper", "videocodec", "audiocodec", "width", "height", "checksum"]

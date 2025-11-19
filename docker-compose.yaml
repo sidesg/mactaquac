@@ -7,7 +7,7 @@ services:
       - .env
     volumes:
       - ./app/:/app/
-      - /mnt/hdd1/mactaquac_dev/media/:/app/media/
+      - ${MEDIAFOLDER}:/app/media/
     ports:
       - 8000:8000
     depends_on:
@@ -26,7 +26,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=devuser
-      - POSTGRES_PASSWORD=devpass
+      - POSTGRES_USER=${SQL_USER}
+      - POSTGRES_PASSWORD=${SQL_PASSWORD}
     env_file:
       - .env

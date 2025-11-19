@@ -1,0 +1,75 @@
+p, li {
+    font-family: "Ungkam", Times, serif;
+}
+
+#navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
+}
+
+#navbar li {
+    float: left;
+}
+
+#navbar li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+#navbar li a:hover {
+    background-color: #111;
+}
+
+#footer p {
+    text-align: center;
+}
+
+.floatcont {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.floatcont .leftfloat {
+    float: left;
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+.wrapper {
+    display: flex;
+    justify-content: space-between;
+    height: auto;
+}
+  
+.main {
+    padding: 12px; 
+    width: 90%; 
+    height: auto; 
+}
+
+.sidebar {
+    position: sticky;
+    top: 0px;
+    width: 300px;
+    height: 100vh;
+    padding: 20px;
+    overflow: hidden;
+}
+
+.lem_init {
+    list-style-type: none;
+    margin: 5;
+    padding: 10;
+    overflow: hidden;
+  }
+
+.lem_init label {
+    float: left;
+}

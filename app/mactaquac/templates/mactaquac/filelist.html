@@ -1,0 +1,10 @@
+{% extends "mactaquac/base.html" %}
+{% block title %}Mactaquac DAMS: Items{% endblock %}
+{% block content %}
+<h1>Media Files</h1>
+    <ul>
+        {% for mediafile in mediafiles %}
+        <li>{{ mediafile.filename }} {{ mediafile.item }}: <a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

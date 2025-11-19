@@ -10,6 +10,7 @@ router.register(r"item", views.ItemViewSetSerialized)
 
 urlpatterns = [
     path("", views.index, name="index"),
+    path("mediafiles/", views.MediaFileListView.as_view(), name="mediafiles"),
     path("api/", include(router.urls), name="api"),
     path("download/<str:filename>/", views.download_media, name="download_media")
 ]

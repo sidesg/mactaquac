@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'mactaquac/style.css' %}">
+
+<head>
+    <title>{% block title %}Mactaquac DAMS{% endblock %}</title>
+</head>
+
+<body>
+    <div id="header">
+        <h1>Mactaquac DAMS</h1>
+        <ul id="navbar">
+            <li><a href="{% url 'mactaquac:index' %}">Home</a></li>
+            <li><a href="{% url 'mactaquac:mediafiles' %}">Media Files</a></li>
+            <li><a href="">About</a></li>
+        </ul>
+        <br>
+    </div>
+    <div id="content">
+        {% block content %}{% endblock %}
+    </div>
+    <div id="footer">
+        <hr>
+        <p>Mactaquac v. 0.0.1</p>
+    </div>
+</body>
+
+</html>

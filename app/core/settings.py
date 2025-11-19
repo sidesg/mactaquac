@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "django.contrib.postgres",
     "mactaquac",
-    "rest_framework"
+    "rest_framework",
+    "django_filters"
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CSRF_TRUSTED_ORIGINS = os.environ.get("TRUSTED_ORIGINS", default="http://localhost:8000").split(" ")
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend'
+    ]
+}

@@ -1,12 +1,13 @@
+import os
 import logging
 import datetime
 from pathlib import Path
+from dotenv import load_dotenv
 from mediafile import MediaFile
 
-WATCHFOLDER = "/mnt/hdd1/mactaquac_dev/to_ingest"
-MEDIAFOLDER = "/mnt/hdd1/mactaquac_dev/media"
-REPORTFOLDER = "../notes"
 LOGFOLDER = "../notes/logs"
+load_dotenv("../.env")
+MEDIAROOT = os.getenv("MEDIAFOLDER")
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")
@@ -20,38 +21,28 @@ def main():
         filemode="a",
     )
 
-    analyze_watchfolder(WATCHFOLDER)
+    analyze_mediafolder(MEDIAROOT)
 
-def analyze_watchfolder(watchfolder: str):
-    for child in Path(watchfolder).iterdir():
+def analyze_mediafolder(mediafolder: str):
+    for child in Path(mediafolder).iterdir():
         if child.is_file():
             try:
-                file = MediaFile.from_path(child)
+                file = MediaFile.from_path(MEDIAROOT, child)
                 file.make_metadata()
             except Exception as e:
                 logging.warning(f"unable to parse metadata for {child}: {e}")
                 continue
             
             try:
-                file.move_media(MEDIAFOLDER)
-            except Exception as e:
-                logging.warning(f"unable to move file {child}: {e}")
-                continue
-            
-            try:
                 file.push_mactaquac("http://localhost:8000/mactaquac/api/mediafile/")
             except Exception as e:
                 logging.warning(f"unable to push data for {child}: {e}")
-                # delete MEDIAFOLDER copy
                 continue
-            else:
-                # Delete WATCHFOLDER copy
-                ...
 
         elif child.is_dir():
-            analyze_watchfolder(child)
+            analyze_mediafolder(child)
         else:
-            pass
+            continue
 
 
 if __name__ == "__main__":

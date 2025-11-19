@@ -1,7 +1,11 @@
 from django.db import models
+import datetime
 
 class Item(models.Model):
     identifier = models.CharField(max_length=255, unique=True)
+    title = models.CharField(default="[NONE]")
+    collection = models.CharField(max_length=50, default="[NONE]")
+    updated = models.BooleanField(default=False)
 
     def __str__(self):
         return self.identifier
@@ -35,12 +39,15 @@ class MediaFile(models.Model):
     }
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="mediafiles")
     type = models.CharField(max_length=255, choices=TYPES)
+    filename = models.CharField(unique=True)
     filepath = models.CharField(unique=True)
     wrapper = models.ForeignKey(Wrapper, on_delete=models.SET_NULL, null=True, blank=True)
     videocodec = models.ForeignKey(VideoCodec, on_delete=models.SET_NULL, null=True, blank=True)
     audiocodec = models.ForeignKey(AudioCodec, on_delete=models.SET_NULL, null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
+    checksum = models.CharField(default="[NONE]")
+    creation_date = models.DateField(default=datetime.date(1900, 1, 1))
 
     def __str__(self):
-        return self.filepath
+        return self.filename
