@@ -1,0 +1,41 @@
+{% extends "mactaquac/base.html" %}
+{% block title %}Mactaquac DAMS: Items{% endblock %}
+{% block content %}
+
+{% if mediafile %}
+
+<h1>{{ mediafile.filename }} ({{ mediafile.type }} file)</h1>
+<p>Storage location: {{ mediafile.storage_location }} (<a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a>)</p>
+<p>Created {{ mediafile.creation_date|date:"Y-m-d" }}</p>
+<div>
+    <h2>Item information</h2>
+    <ul>
+        <li>Item: {{ mediafile.item.identifier }}</li>
+        <li>Item title: {{ mediafile.item.title }}</li>
+        <li>Collection: {{ mediafile.item.collection }}</li>
+    </ul>
+</div>
+<div>
+    <h2>Extent</h2>
+    <ul>
+        <li>File size (MB): {{ mediafile.filesize }}</li>
+        <li>Duration: {{ mediafile.duration_min }}:{{mediafile.duration_sec}}</li>
+    </ul>
+</div>
+<div>
+    <h2>Technical metadata</h2>
+    <ul>
+        <li>Wrapper: {{ mediafile.wrapper }}</li>
+        <li>Video codec: {{ mediafile.videocodec }}</li>
+        <li>Audio codec: {{ mediafile.audiocodec }}</li>
+        <li>Resolution: {{ mediafile.width }} x {{ mediafile.height }}</li>
+        <li>Checksum (md5): {{ mediafile.checksum }}</li>
+    </ul>
+</div>
+
+{% else %}
+
+<p>No media file to display.</p>
+
+{% endif %}
+{% endblock %}

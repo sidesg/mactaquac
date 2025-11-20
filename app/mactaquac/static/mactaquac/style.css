@@ -73,3 +73,7 @@ p, li {
 .lem_init label {
     float: left;
 }
+
+.pagination {
+    text-align: center;
+}

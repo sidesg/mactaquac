@@ -1,10 +1,64 @@
 {% extends "mactaquac/base.html" %}
+{% load mactaquac_extras %}
 {% block title %}Mactaquac DAMS: Items{% endblock %}
 {% block content %}
 <h1>Media Files</h1>
-    <ul>
-        {% for mediafile in mediafiles %}
-        <li>{{ mediafile.filename }} {{ mediafile.item }}: <a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a></li>
-        {% endfor %}
-    </ul>
+<form method="get">
+  {{ form }}
+  <button type="submit">Search</button>
+</form>
+
+{% if mediafiles %}
+    <table>
+        <tr>
+            <th>Item ID</th>
+            <th>Filename</th>
+            <th>Duration</th>
+            <th>Size (MB)</th>
+            <th>Item title</th>
+            <th>Collection</th>
+            <th>Wrapper</th>
+            <th>Video codec</th>
+            <th>Audio codec</th>
+            <th>Resolution</th>
+            <th>Created</th>
+            <th>Download</th>
+        </tr>
+    {% for mediafile in mediafiles %}
+        <tr>
+            <td><a href="{% url 'mactaquac:mediafile' mediafile.pk %}">{{ mediafile.item }}</a></td>
+            <td>{{ mediafile.filename }}</td>
+            <td>{{ mediafile.duration_min }}:{{ mediafile.duration_sec }}</td>
+            <td>{{ mediafile.filesize }}</td>
+            <td>{{ mediafile.item.title }}</td>
+            <td>{{ mediafile.item.collection }}</td>
+            <td>{{ mediafile.wrapper }}</td>
+            <td>{{ mediafile.videocodec }}</td>
+            <td>{{ mediafile.audiocodec }}</td>
+            <td>{{ mediafile.width }} x {{ mediafile.height }}</td>
+            <td>{{ mediafile.creation_date|date:"Y-m-d" }}</td>
+            <td><a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a></td>
+        </tr>
+    {% endfor %}
+    </table>
+    <div class="pagination">
+        <span class="step-links">
+            {% if mediafiles.has_previous %}
+                <a href="?{% url_replace request 'page' 1 %}">&laquo; first</a>
+                <a href="?{% url_replace request 'page' mediafiles.previous_page_number %}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ mediafiles.number }} of {{ mediafiles.paginator.num_pages }}.
+            </span>
+
+            {% if mediafiles.has_next %}
+                <a href="?{% url_replace request 'page' mediafiles.next_page_number %}">next</a>
+                <a href="?{% url_replace request 'page' mediafiles.paginator.num_pages %}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+{% else %}
+<p>No media files to display.</p>
+{% endif %}
 {% endblock %}

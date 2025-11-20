@@ -5,9 +5,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 from mediafile import MediaFile
 
-LOGFOLDER = "../notes/logs"
+# LOGFOLDER = "../notes/logs"
 load_dotenv("../.env")
 MEDIAROOT = os.getenv("MEDIAFOLDER")
+LOGFOLDER = os.getenv("LOGFOLDER")
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")
@@ -32,7 +33,6 @@ def analyze_mediafolder(mediafolder: str):
             except Exception as e:
                 logging.warning(f"unable to parse metadata for {child}: {e}")
                 continue
-            
             try:
                 file.push_mactaquac("http://localhost:8000/mactaquac/api/mediafile/")
             except Exception as e:

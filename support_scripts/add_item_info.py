@@ -1,12 +1,14 @@
 import polars as pl
 import requests
 import logging
+import os
 from dotenv import load_dotenv
 import datetime
 
 DATAFILE = "../data/SMI_allItems.csv"
-LOGFOLDER = "../notes/logs"
+# LOGFOLDER = "../notes/logs"
 load_dotenv("../.env")
+LOGFOLDER = os.getenv("LOGFOLDER")
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")

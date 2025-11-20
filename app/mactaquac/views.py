@@ -1,15 +1,18 @@
 from django.shortcuts import render
 from django.http import HttpResponse, FileResponse, Http404
 from django.views import generic
+from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage
+from django.core.paginator import PageNotAnInteger
 
 from rest_framework import viewsets
 from rest_framework.response import Response
 
-import django_filters.rest_framework
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import MediaFile, Item
 from .serializers import MediaFileSerializer, ItemSerializer
+from .forms import MediaFileSearchForm
 
 import mimetypes
 from pathlib import Path
@@ -19,21 +22,46 @@ MEDIA_ROOT = "/app/media"
 def index(request):
     return render(request, "mactaquac/home.html")
 
-class MediaFileListView(generic.ListView):
-    model = MediaFile
-    context_object_name = "mediafiles"
+class MediaFileListView(generic.FormView):
     template_name = "mactaquac/filelist.html"
+    
+    def get(self, request, *args, **kwargs):
+        form = MediaFileSearchForm(self.request.GET or None)
 
+        if form.is_valid():
+            query_set = MediaFile.objects.all()
+            item_identifier = request.GET.get("item_identifier")
+            collection = request.GET.get("collection")
+            title = request.GET.get("title")
+            filename = request.GET.get("filename")
+
+            if item_identifier:
+                query_set = query_set.filter(item__identifier=item_identifier.strip())
+            if collection:
+                query_set = query_set.filter(item__collection=collection.strip())
+            if title:
+                query_set = query_set.filter(item__title__contains=title.strip())
+            if filename:
+                query_set = query_set.filter(filename__contains=filename)
+        else:
+            # query_set = None
+            query_set = MediaFile.objects.all()
+
+        paginator = Paginator(query_set, 25)
+        page = self.request.GET.get('page')
+        try:
+            query_set = paginator.page(page)
+        except PageNotAnInteger:
+            query_set = paginator.page(1)
+        except EmptyPage:
+            query_set = paginator.page(paginator.num_pages)
+
+        return self.render_to_response(self.get_context_data(form=form, mediafiles=query_set)) 
 
 class MediaFileDetailView(generic.DetailView):
     model = MediaFile
-
-class ItemListView(generic.ListView):
-    model = Item
-
-class ItemDetailView(generic.DetailView):
-    model = Item
-
+    template_name = "mactaquac/mediafile.html"
+    
 class MediaFileViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = MediaFileSerializer
     queryset = MediaFile.objects.all()

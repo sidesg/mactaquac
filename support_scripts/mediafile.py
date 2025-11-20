@@ -14,6 +14,8 @@ class MediaFile():
 
     def make_metadata(self):
         videocodec, width, height = self._get_videodata()
+        duration_mins, duration_secs = self._get_duration()
+
         self.item = self._get_item()
         self.filename = self.mediainfo.general_tracks[0].file_name_extension
         self.filepath = self._get_filepath()
@@ -23,6 +25,11 @@ class MediaFile():
         self.width = width
         self.height = height
         self.audiocodec = self._get_audiocodec()
+        self.creation_date = self._get_creation_date()
+        self.size = self._get_size()
+        self.minutes = duration_mins
+        self.seconds = duration_secs
+
 
         logging.info(f"metadata for '{self.mediapath}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
 
@@ -57,18 +64,36 @@ class MediaFile():
         else:
             return None
 
+    def _get_creation_date(self):
+        datetime = self.mediainfo.general_tracks[0].encoded_date
+        match = re.match(r"(\d{4}-\d{2}-\d{2})", datetime).group(1)
+        return match if match else None
+
+    def _get_size(self):
+        bytes = self.mediainfo.general_tracks[0].file_size
+        return round(bytes / (1024 * 1024), 2)
+
+    def _get_duration(self):
+        m, s = divmod(self.mediainfo.general_tracks[0].duration, 60000)
+        return m, round(s / 1000, 0)
+
     def push_mactaquac(self, apipath: str):
         data = {
             "item": self.item,
             "filename": self.filename,
             "filepath": self.filepath,
+            "storage_location": self.mediapath,
             "type": self.mediatype,
             "wrapper": self.wrapper,
-            "videocodec": self.videocodec if self.videocodec else "",
-            "audiocodec": self.audiocodec if self.audiocodec else "",
+            "videocodec": self.videocodec if self.videocodec else "No image",
+            "audiocodec": self.audiocodec if self.audiocodec else "No sound",
             "width": self.width if self.width else "",
             "height": self.height if self.height else "",
-            "checksum": self._make_checksum()
+            "checksum": self._make_checksum(),
+            "filesize": self.size,
+            "duration_min": self.minutes,
+            "duration_sec": self.seconds,
+            "creation_date": self.creation_date
         }            
         r = requests.post(apipath, data=data)
 

@@ -41,6 +41,7 @@ class MediaFile(models.Model):
     type = models.CharField(max_length=255, choices=TYPES)
     filename = models.CharField(unique=True)
     filepath = models.CharField(unique=True)
+    storage_location = models.CharField(default="[UNKNOWN]")
     wrapper = models.ForeignKey(Wrapper, on_delete=models.SET_NULL, null=True, blank=True)
     videocodec = models.ForeignKey(VideoCodec, on_delete=models.SET_NULL, null=True, blank=True)
     audiocodec = models.ForeignKey(AudioCodec, on_delete=models.SET_NULL, null=True, blank=True)
@@ -48,6 +49,9 @@ class MediaFile(models.Model):
     height = models.IntegerField(null=True, blank=True)
     checksum = models.CharField(default="[NONE]")
     creation_date = models.DateField(default=datetime.date(1900, 1, 1))
+    filesize = models.FloatField(default=0)
+    duration_min = models.IntegerField(default=0)
+    duration_sec = models.IntegerField(default=0)
 
     def __str__(self):
         return self.filename
