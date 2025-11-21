@@ -1,5 +1,6 @@
 volumes:
   postgres_data:
+  pgadmin_data:
 services:
   web:
     build: ./app
@@ -22,11 +23,22 @@ services:
         - action: rebuild
           path: ./app/uv.lock
   db:
-    image: postgres:15
+    image: postgres:17
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
       - POSTGRES_USER=${SQL_USER}
       - POSTGRES_PASSWORD=${SQL_PASSWORD}
+    env_file:
+      - .env
+  pgadmin:
+    image: dpage/pgadmin4
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
     env_file:
       - .env

@@ -36,9 +36,9 @@ class MediaFileListView(generic.FormView):
             filename = request.GET.get("filename")
 
             if item_identifier:
-                query_set = query_set.filter(item__identifier=item_identifier.strip())
+                query_set = query_set.filter(item__identifier=item_identifier.strip().upper())
             if collection:
-                query_set = query_set.filter(item__collection=collection.strip())
+                query_set = query_set.filter(item__collection=collection.strip().upper())
             if title:
                 query_set = query_set.filter(item__title__contains=title.strip())
             if filename:

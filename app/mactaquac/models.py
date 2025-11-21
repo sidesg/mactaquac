@@ -48,10 +48,10 @@ class MediaFile(models.Model):
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
     checksum = models.CharField(default="[NONE]")
-    creation_date = models.DateField(default=datetime.date(1900, 1, 1))
+    creation_date = models.DateField(null=True, blank=True)
     filesize = models.FloatField(default=0)
-    duration_min = models.IntegerField(default=0)
-    duration_sec = models.IntegerField(default=0)
+    duration_min = models.IntegerField(null=True, blank=True)
+    duration_sec = models.IntegerField(null=True, blank=True)
 
     def __str__(self):
         return self.filename

@@ -15,7 +15,7 @@ def main():
     logging.basicConfig(
         format="{asctime} {levelname} {name} {message}",
         style="{",
-        level=logging.INFO,
+        level=logging.DEBUG,
         datefmt="%Y-%m-%d %H:%M",
         filename=f"{LOGFOLDER}/itemupdate-{now}.log",
         encoding="utf-8",
@@ -27,46 +27,48 @@ def main():
         columns=["Identifier", "StrTitle", "Collection"]
     )
 
-    unupdated = get_unupdated()
-
-    for itemnumber in unupdated:
-        dff = df.filter(pl.col("Identifier") == itemnumber)
-
-        if len(dff) == 0:
-            logging.warning(f"no catalogue info for {itemnumber}")
-            continue
-
-        try:
-            r = requests.patch(
-                f"http://localhost:8000/mactaquac/api/item/{itemnumber}/",
-                data={
-                    "collection": dff.get_column('Collection')[0],
-                    "title": dff.get_column('StrTitle')[0],
-                    "updated": "True"
-                }
-            )
-            print(r.url)
-            if r.status_code == 200:
-                logging.info(f"updated {itemnumber}")
-            else:
-                logging.warning(f"error processing {itemnumber}, status {r.status_code}")
-        except Exception as e:
-            logging.warning(f"error in api call for {itemnumber}: {e}")
-
-
-def get_unupdated() -> list:
-    r = requests.get(
-        "http://localhost:8000/mactaquac/api/item/?updated=False"
+    s = requests.Session()
+    items_to_mactaquac(
+        "http://localhost:8000/mactaquac/api/item/?updated=False&page=1",
+        df, s
     )
 
+def items_to_mactaquac(endpoint: str, df: pl.DataFrame, session: requests.Session):
+    r = session.get(endpoint)
     if r.status_code == 200:
-        return [
+        resultjson: dict = r.json()
+        unupdated = [
             item["identifier"]
-            for item in r.json()
+            for item in resultjson["results"]
         ]
-    else:
-        return []
+        for itemnumber in unupdated:
+            dff = df.filter(pl.col("Identifier") == itemnumber)
 
+            if len(dff) == 0:
+                logging.warning(f"no catalogue info for {itemnumber}")
+                continue
+
+            try:
+                r = requests.patch(
+                    f"http://localhost:8000/mactaquac/api/item/{itemnumber}/",
+                    data={
+                        "collection": dff.get_column('Collection')[0],
+                        "title": dff.get_column('StrTitle')[0],
+                        "updated": "True"
+                    }
+                )
+
+                if r.status_code == 200:
+                    logging.info(f"updated {itemnumber}")
+                else:
+                    logging.warning(f"error processing {itemnumber}, status {r.status_code}")
+            except Exception as e:
+                logging.warning(f"error in api call for {itemnumber}: {e}")
+        
+        if nextpage := resultjson.get("next", None):
+            items_to_mactaquac(nextpage, df, session)
+    else:
+        raise logging.warning(f"error in api call to {endpoint}: response code {r.status_code}")
 
 if __name__ == "__main__":
     main()

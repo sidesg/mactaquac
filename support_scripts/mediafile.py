@@ -4,22 +4,25 @@ import re
 import shutil
 import logging
 import hashlib
+import os
+import datetime
 from pathlib import Path
 
 class MediaFile():
-    def __init__(self, watchfolder: str, mediapath: str, mediainfo: MediaInfo):
+    def __init__(self, watchfolder: str, mediapath: str):
         self.watchfolder = watchfolder
         self.mediapath = mediapath
-        self.mediainfo = mediainfo
 
     def make_metadata(self):
+        self.filename = Path(self.mediapath).name
+        self.item = self._get_item()
+        self.mediainfo = self._make_mediainfo()
+        self.mediatype = self._get_mediatype()
+
         videocodec, width, height = self._get_videodata()
         duration_mins, duration_secs = self._get_duration()
 
-        self.item = self._get_item()
-        self.filename = self.mediainfo.general_tracks[0].file_name_extension
         self.filepath = self._get_filepath()
-        self.mediatype = self._get_mediatype()
         self.wrapper = self.mediainfo.general_tracks[0].format
         self.videocodec = videocodec
         self.width = width
@@ -30,16 +33,28 @@ class MediaFile():
         self.minutes = duration_mins
         self.seconds = duration_secs
 
-
-        logging.info(f"metadata for '{self.mediapath}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
+        # logging.info(f"metadata for '{self.mediapath}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
 
     def _get_item(self) -> str:
-        match = re.match(r"([SVF])(\d+)", self.mediainfo.general_tracks[0].file_name)
-        prefix = match.group(1)
-        number = match.group(2)
-        number = number.zfill(5)
-        return prefix + number
-    
+        if match := re.match(r"([SVF])(\d+)", self.filename):
+            prefix = match.group(1)
+            number = match.group(2)
+            number = number.zfill(5)
+            return prefix + number
+        elif match := re.match(r"(SCD)(\d+)", self.filename):
+            prefix = match.group(1)
+            number = match.group(2)
+            number = number.zfill(5)
+            return "S" + number
+        else:
+            raise RuntimeError("unable to parse item number")
+        
+    def _make_mediainfo(self):
+        try:
+            return MediaInfo.parse(self.mediapath)
+        except:
+            raise RuntimeError("mediainfo cannot parse file")
+
     def _get_filepath(self) -> str:
         filepath = Path(self.mediapath).relative_to(self.watchfolder)
         return filepath
@@ -50,7 +65,8 @@ class MediaFile():
         elif self.mediainfo.audio_tracks:
             return "audio"
         else:
-            return "textual"
+            # return "textual"
+            raise RuntimeError("no parsable video or audio streams")
     
     def _get_videodata(self):
         if videotracks := self.mediainfo.video_tracks:
@@ -65,19 +81,24 @@ class MediaFile():
             return None
 
     def _get_creation_date(self):
-        datetime = self.mediainfo.general_tracks[0].encoded_date
-        match = re.match(r"(\d{4}-\d{2}-\d{2})", datetime).group(1)
-        return match if match else None
+        if datetime := self.mediainfo.general_tracks[0].encoded_date:
+            match = re.match(r"(\d{4}-\d{2}-\d{2})", datetime).group(1)
+            return match if match else None
+        else:
+            return None
 
     def _get_size(self):
         bytes = self.mediainfo.general_tracks[0].file_size
         return round(bytes / (1024 * 1024), 2)
 
     def _get_duration(self):
-        m, s = divmod(self.mediainfo.general_tracks[0].duration, 60000)
-        return m, round(s / 1000, 0)
+        try:
+            m, s = divmod(self.mediainfo.general_tracks[0].duration, 60000)
+            return m, round(s / 1000, 0)
+        except:
+            return 0, 0
 
-    def push_mactaquac(self, apipath: str):
+    def push_mactaquac(self, apipath: str, session: requests.Session):
         data = {
             "item": self.item,
             "filename": self.filename,
@@ -87,15 +108,15 @@ class MediaFile():
             "wrapper": self.wrapper,
             "videocodec": self.videocodec if self.videocodec else "No image",
             "audiocodec": self.audiocodec if self.audiocodec else "No sound",
-            "width": self.width if self.width else "",
-            "height": self.height if self.height else "",
-            "checksum": self._make_checksum(),
+            "width": self.width,
+            "height": self.height,
+            # "checksum": self._make_checksum(),
             "filesize": self.size,
             "duration_min": self.minutes,
             "duration_sec": self.seconds,
             "creation_date": self.creation_date
         }            
-        r = requests.post(apipath, data=data)
+        r = session.post(apipath, data=data)
 
         if r.status_code == 201:
             logging.info(f"pushed data for '{self.mediapath}'")
@@ -126,6 +147,5 @@ class MediaFile():
         return MediaFile(
             watchfolder,
             path,
-            MediaInfo.parse(path)
         )
 
