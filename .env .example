@@ -1,0 +1,18 @@
+DEBUG=1
+SECRET_KEY=foo
+DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]
+TRUSTED_ORIGINS=http://localhost:8000 http://127.0.0.1:8000 
+
+SQL_ENGINE=django.db.backends.postgresql
+SQL_DATABASE=postgres
+SQL_USER=defaultuser
+SQL_PASSWORD=defaultpass
+SQL_HOST=db
+SQL_PORT=5432
+DATABASE=postgres
+
+MEDIAFOLDER=media/file/directory
+LOGFOLDER=/logs
+
+PGADMIN_DEFAULT_EMAIL=admin@admin.com
+PGADMIN_DEFAULT_PASSWORD=password

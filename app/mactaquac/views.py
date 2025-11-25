@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from django.http import HttpResponse, FileResponse, Http404
+from django.http import HttpResponse, Http404
 from django.views import generic
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
@@ -14,10 +14,9 @@ from .models import MediaFile, Item
 from .serializers import MediaFileSerializer, ItemSerializer
 from .forms import MediaFileSearchForm
 
-import mimetypes
 from pathlib import Path
 
-MEDIA_ROOT = "/app/media"
+MEDIA_ROOT = "/home/app/web/media"
 
 def index(request):
     return render(request, "mactaquac/home.html")
@@ -86,11 +85,12 @@ def download_media(request, filename):
         raise Http404("File not found.")
 
     else:
-        mime_type, _ = mimetypes.guess_type(safe_path)
+        response = HttpResponse()
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
 
-        return FileResponse(
-            open(safe_path, "rb"),
-            as_attachment=True,
-            filename=filename,
-            content_type=mime_type or "application/octet-stream",
-        )
+        # This tells Nginx to serve the file
+        response['X-Accel-Redirect'] = f"/media/{filepath}"
+
+        return response
+    

@@ -1,16 +1,28 @@
 volumes:
   postgres_data:
   pgadmin_data:
+  static_volume:
 services:
+  nginx:
+    build: ./nginx
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - ${MEDIAFOLDER}:/home/app/web/media
+    ports:
+      - 8000:80
+    depends_on:
+      - web
   web:
-    build: ./app
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
     env_file:
       - .env
     volumes:
-      - ./app/:/app/
-      - ${MEDIAFOLDER}:/app/media/
-    ports:
-      - 8000:8000
+      - static_volume:/home/app/web/staticfiles
+      - ${MEDIAFOLDER}:/home/app/web/media
+    expose:
+      - 8000
     depends_on:
       - db
     develop:
@@ -39,6 +51,6 @@ services:
       - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
       - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - "8080:80"
+      - 8080:80
     env_file:
       - .env

@@ -36,12 +36,12 @@ class MediaFile():
         # logging.info(f"metadata for '{self.mediapath}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
 
     def _get_item(self) -> str:
-        if match := re.match(r"([SVF])(\d+)", self.filename):
+        if match := re.match(r"([SVF])(\d+[A-G]?)", self.filename):
             prefix = match.group(1)
             number = match.group(2)
             number = number.zfill(5)
             return prefix + number
-        elif match := re.match(r"(SCD)(\d+)", self.filename):
+        elif match := re.match(r"(SCD)(\d+[A-G]?)", self.filename):
             prefix = match.group(1)
             number = match.group(2)
             number = number.zfill(5)
