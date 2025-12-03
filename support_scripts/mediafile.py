@@ -121,7 +121,7 @@ class MediaFile():
         if r.status_code == 201:
             logging.info(f"pushed data for '{self.mediapath}'")
         else:
-            raise requests.ConnectionError(f"response code {r.status_code}")
+            raise requests.ConnectionError(f"{r.status_code}: {r.reason}")
 
     def _make_checksum(self) -> str:
         hash = hashlib.md5()

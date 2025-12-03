@@ -5,7 +5,12 @@
 <h1>Media Files</h1>
 <form method="get">
   {{ form }}
-  <button type="submit">Search</button>
+  <button type="submit", value="Search">Search</button>
+</form>
+
+<form method="get">
+  {{ filter_form }}
+  <button type="submit", value="Filter">Filter</button>
 </form>
 
 {% if mediafiles %}

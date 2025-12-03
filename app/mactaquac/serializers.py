@@ -36,4 +36,3 @@ class MediaFileSerializer(serializers.ModelSerializer):
     class Meta:
         model = MediaFile
         fields = "__all__"
-        # fields = ["pk", "filename", "storage_location", "item", "type", "filepath", "wrapper", "videocodec", "audiocodec", "width", "height", "checksum"]
