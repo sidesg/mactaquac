@@ -29,7 +29,7 @@ def main():
 
     s = requests.Session()
     items_to_mactaquac(
-        "http://localhost:8000/mactaquac/api/item/?updated=False&page=1",
+        "http://localhost/mactaquac/api/item/?updated=False&page=1",
         df, s
     )
 
@@ -50,7 +50,7 @@ def items_to_mactaquac(endpoint: str, df: pl.DataFrame, session: requests.Sessio
 
             try:
                 r = requests.patch(
-                    f"http://localhost:8000/mactaquac/api/item/{itemnumber}/",
+                    f"http://localhost/mactaquac/api/item/{itemnumber}/",
                     data={
                         "collection": dff.get_column('Collection')[0],
                         "title": dff.get_column('StrTitle')[0],

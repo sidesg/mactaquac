@@ -90,7 +90,7 @@ class MediaFileViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = MediaFileSerializer
     queryset = MediaFile.objects.all()
     filter_backends = [DjangoFilterBackend]
-    filterset_fields = ["filename", "item__identifier", "type"]
+    filterset_fields = ["filename", "item__identifier", "type", "checksum"]
 
 class ItemViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
