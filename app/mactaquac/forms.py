@@ -6,18 +6,6 @@ class MediaFileSearchForm(forms.Form):
     title = forms.CharField(label="item title", max_length=255, required=False)
     filename = forms.CharField(label="filename", required=False)
 
-    # media_wrapper = forms.CharField(
-    #     required=False,
-    #     label="Media Wrapper",
-    #     max_length=55,
-    #     widget=forms.HiddenInput()
-    # )
-    # dimensions_width = forms.IntegerField(
-    #     required=False,
-    #     label="Min. width",
-    #     widget=forms.HiddenInput()
-    # )
-
 class MediaFileFilterForm(forms.Form):
     media_wrapper = forms.MultipleChoiceField(
         required=False,

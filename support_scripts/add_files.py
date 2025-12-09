@@ -36,7 +36,9 @@ def analyze_mediafolder(mediafolder: str):
                 continue
             try:
                 file.push_mactaquac(
-                    "http://localhost:8000/mactaquac/api/mediafile/", s)
+                    "http://localhost/mactaquac/api/mediafile/", 
+                    s
+                )
             except Exception as e:
                 logging.warning(f"unable to push data for '{child}': {e}")
                 continue

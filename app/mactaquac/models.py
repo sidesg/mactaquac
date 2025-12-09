@@ -1,5 +1,4 @@
 from django.db import models
-import datetime
 
 class Item(models.Model):
     identifier = models.CharField(max_length=255, unique=True)
@@ -41,13 +40,13 @@ class MediaFile(models.Model):
     type = models.CharField(max_length=255, choices=TYPES)
     filename = models.CharField(unique=True)
     filepath = models.CharField(unique=True)
-    storage_location = models.CharField(default="[UNKNOWN]")
+    storage_location = models.CharField()
     wrapper = models.ForeignKey(Wrapper, on_delete=models.SET_NULL, null=True, blank=True)
     videocodec = models.ForeignKey(VideoCodec, on_delete=models.SET_NULL, null=True, blank=True)
     audiocodec = models.ForeignKey(AudioCodec, on_delete=models.SET_NULL, null=True, blank=True)
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
-    checksum = models.CharField(default="[NONE]")
+    checksum = models.CharField(null=True, blank=True)
     creation_date = models.DateField(null=True, blank=True)
     filesize = models.FloatField(default=0)
     duration_min = models.IntegerField(null=True, blank=True)

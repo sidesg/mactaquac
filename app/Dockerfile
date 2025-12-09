@@ -33,10 +33,11 @@ COPY --from=base /bin/uv /usr/local/bin/uv
 COPY --from=base /app/.venv $APP_HOME/.venv
 COPY --from=base /app $APP_HOME
 
+# Copy the project into the image
+ADD . $APP_HOME
+
 RUN chown -R app:app $HOME
 USER app
 
-# Copy the project into the image
-ADD . $APP_HOME
 
 CMD [ "uv", "run", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
