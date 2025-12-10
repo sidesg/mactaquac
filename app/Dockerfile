@@ -1,4 +1,4 @@
-FROM python:3.14-slim-trixie as base
+FROM python:3.14-slim-trixie AS base
 
 # The installer requires curl (and certificates) to download the release archive
 RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
@@ -17,7 +17,7 @@ COPY pyproject.toml uv.lock ./
 
 RUN uv sync --frozen --compile-bytecode
 
-FROM python:3.14-slim-trixie as final
+FROM python:3.14-slim-trixie AS final
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
 
 RUN addgroup --system app && adduser --system --group app
