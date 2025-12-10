@@ -9,12 +9,12 @@ import datetime
 from pathlib import Path
 
 class MediaFile():
-    def __init__(self, watchfolder: str, mediapath: str):
+    def __init__(self, watchfolder: str, absolute_path: str):
         self.watchfolder = watchfolder
-        self.mediapath = mediapath
+        self.absolute_path = absolute_path
 
     def make_metadata(self):
-        self.filename = Path(self.mediapath).name
+        self.filename = Path(self.absolute_path).name
         self.item = self._get_item()
         self.mediainfo = self._make_mediainfo()
         self.mediatype = self._get_mediatype()
@@ -33,7 +33,7 @@ class MediaFile():
         self.minutes = duration_mins
         self.seconds = duration_secs
 
-        # logging.info(f"metadata for '{self.mediapath}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
+        # logging.info(f"metadata for '{self.absolute_path}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
 
     def _get_item(self) -> str:
         if match := re.match(r"([SVF])(\d+[A-G]?)", self.filename):
@@ -51,12 +51,12 @@ class MediaFile():
         
     def _make_mediainfo(self):
         try:
-            return MediaInfo.parse(self.mediapath)
+            return MediaInfo.parse(self.absolute_path)
         except:
             raise RuntimeError("mediainfo cannot parse file")
 
     def _get_filepath(self) -> str:
-        filepath = Path(self.mediapath).relative_to(self.watchfolder)
+        filepath = Path(self.absolute_path).relative_to(self.watchfolder)
         return filepath
     
     def _get_mediatype(self) -> str:
@@ -103,11 +103,11 @@ class MediaFile():
             "item": self.item,
             "filename": self.filename,
             "filepath": self.filepath,
-            "storage_location": self.mediapath,
+            "storage_location": self.absolute_path,
             "type": self.mediatype,
             "wrapper": self.wrapper,
-            "videocodec": self.videocodec if self.videocodec else "No image",
-            "audiocodec": self.audiocodec if self.audiocodec else "No sound",
+            "videocodec": self.videocodec,
+            "audiocodec": self.audiocodec,
             "width": self.width,
             "height": self.height,
             # "checksum": self._make_checksum(),
@@ -119,13 +119,13 @@ class MediaFile():
         r = session.post(apipath, data=data)
 
         if r.status_code == 201:
-            logging.info(f"pushed data for '{self.mediapath}'")
+            logging.info(f"pushed data for '{self.absolute_path}'")
         else:
             raise requests.ConnectionError(f"{r.status_code}: {r.reason}")
 
     def _make_checksum(self) -> str:
         hash = hashlib.md5()
-        with open(self.mediapath, "rb") as file:
+        with open(self.absolute_path, "rb") as file:
             while True:
                 data = file.read(65536)
                 if not data:
@@ -143,9 +143,31 @@ class MediaFile():
         logging.info(f"copied '{self.watchpath}' to '{dest}'")
 
     @classmethod
-    def from_path(cls, watchfolder: str, path:str) -> "MediaFile":
+    def from_path(cls, watchfolder: str, absolute_path:str) -> "MediaFile":
         return MediaFile(
             watchfolder,
-            path,
+            absolute_path,
         )
-
+    
+    @classmethod
+    def from_api(cls, jsonobj: dict) -> "MediaFile":
+        mediafile = MediaFile(
+            #watchfolder is difference between filepath and storage_location
+        )
+        # data = {
+        #     "item": cls.item,
+        #     "filename": self.filename,
+        #     "filepath": self.filepath,
+        #     "storage_location": self.absolute_path,
+        #     "type": self.mediatype,
+        #     "wrapper": self.wrapper,
+        #     "videocodec": self.videocodec,
+        #     "audiocodec": self.audiocodec,
+        #     "width": self.width,
+        #     "height": self.height,
+        #     # "checksum": self._make_checksum(),
+        #     "filesize": self.size,
+        #     "duration_min": self.minutes,
+        #     "duration_sec": self.seconds,
+        #     "creation_date": self.creation_date
+        # }
