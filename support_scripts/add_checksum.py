@@ -15,7 +15,7 @@ def main():
     logging.basicConfig(
         format="{asctime} {levelname} {name} {message}",
         style="{",
-        level=logging.DEBUG,
+        level=logging.INFO,
         datefmt="%Y-%m-%d %H:%M",
         filename=f"{LOGFOLDER}/checksum-{now}.log",
         encoding="utf-8",

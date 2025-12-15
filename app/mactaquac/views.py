@@ -40,6 +40,11 @@ class MediaFileListView(generic.FormView):
         video_codec = None
         audio_codec = None
 
+        #Change possible values of filter categories based on query set unique values
+        wrapper_list = Wrapper.objects.all()
+        vcodec_list = VideoCodec.objects.all()
+        acodec_list = AudioCodec.objects.all()
+
         if form.is_valid():
             #Get data from request
             item_identifier = request.GET.get("item_identifier")
@@ -60,6 +65,11 @@ class MediaFileListView(generic.FormView):
                 query_set = query_set.filter(item__title__contains=title.strip())
             if filename:
                 query_set = query_set.filter(filename__contains=filename)
+
+            wrapper_list = Wrapper.objects.filter(id__in=query_set.values("wrapper"))
+            vcodec_list = VideoCodec.objects.filter(id__in=query_set.values("videocodec"))
+            acodec_list = AudioCodec.objects.filter(id__in=query_set.values("audiocodec"))
+
             if media_wrapper:
                 query_set = query_set.filter(wrapper__name__in=media_wrapper)
             if video_codec:
@@ -68,11 +78,6 @@ class MediaFileListView(generic.FormView):
                 query_set = query_set.filter(audiocodec__name__in=audio_codec)
             if dimensions_width:
                 query_set = query_set.filter(width__gt=dimensions_width)
-
-        #Change possible values of filter categories based on query set unique values
-        wrapper_list = Wrapper.objects.filter(id__in=query_set.values("wrapper"))
-        vcodec_list = VideoCodec.objects.filter(id__in=query_set.values("videocodec"))
-        acodec_list = AudioCodec.objects.filter(id__in=query_set.values("audiocodec"))
 
         #Set up pagination of query set
         paginator = Paginator(query_set, 25)
