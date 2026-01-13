@@ -32,6 +32,7 @@ class MediaFile():
         self.size = self._get_size()
         self.minutes = duration_mins
         self.seconds = duration_secs
+        self.date_added = datetime.date.today().strftime("%Y-%m-%d")
 
         # logging.info(f"metadata for '{self.absolute_path}': {self.item}; {self.filepath}; {self.mediatype}; {self.wrapper}; {self.videocodec}; {self.audiocodec}; {self.width}; {self.height}")
 
@@ -114,7 +115,8 @@ class MediaFile():
             "filesize": self.size,
             "duration_min": self.minutes,
             "duration_sec": self.seconds,
-            "creation_date": self.creation_date
+            "creation_date": self.creation_date,
+            "date_added": self.date_added
         }            
         r = session.post(apipath, data=data)
 

@@ -60,7 +60,10 @@ def process_items(endpoint: str, session: requests.Session):
                 try:
                     r = requests.patch(
                         f"{ENDPOINT}{mediafilenumber}/",
-                        data={"checksum": checksum}
+                        data={
+                            "checksum": checksum,
+                            "date_modified": datetime.date.today().strftime("%Y-%m-%d"),
+                        }
                     )
                     if r.status_code == 200:
                         logging.info(f"updated {filename}")

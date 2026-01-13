@@ -5,8 +5,15 @@
 {% if mediafile %}
 
 <h1>{{ mediafile.filename }} ({{ mediafile.type }} file)</h1>
-<p>Storage location: {{ mediafile.storage_location }} (<a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a>)</p>
-<p>Created {{ mediafile.creation_date|date:"Y-m-d" }}</p>
+<ul>
+    <li>Storage location: {{ mediafile.storage_location }} (<a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a>)</li>
+    <li>File created {{ mediafile.creation_date|date:"Y-m-d" }}</li>
+    <li>Added to Mactaquac {{ mediafile.date_added|date:"Y-m-d" }}</li>
+    {% if mediafile.date_modified %}
+    <li>Last modified {{ mediafile.date_modified|date:"Y-m-d" }}</li>
+    {% endif %}
+</ul>
+
 <div>
     <h2>Item information</h2>
     <ul>
@@ -19,7 +26,7 @@
     <h2>Extent</h2>
     <ul>
         <li>File size (MB): {{ mediafile.filesize }}</li>
-        <li>Duration: {{ mediafile.duration_min }}:{{mediafile.duration_sec}}</li>
+        <li>Duration: {{ mediafile.duration_min }}:{% if mediafile.duration_sec < 10 %}0{{ mediafile.duration_sec }}{% else %}{{ mediafile.duration_sec }}{% endif %}</li>
     </ul>
 </div>
 <div>

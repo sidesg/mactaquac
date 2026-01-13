@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 class Item(models.Model):
     identifier = models.CharField(max_length=255, unique=True)
@@ -51,6 +52,11 @@ class MediaFile(models.Model):
     filesize = models.FloatField(default=0)
     duration_min = models.IntegerField(null=True, blank=True)
     duration_sec = models.IntegerField(null=True, blank=True)
+    date_added = models.DateField(default=timezone.now())
+    date_modified = models.DateField(null=True, blank=True)
+
+    def find_duplicates(self):
+        return MediaFile.objects.filter(checksum=self.checksum)
 
     def __str__(self):
         return self.filename

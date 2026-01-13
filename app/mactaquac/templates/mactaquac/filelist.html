@@ -36,7 +36,7 @@
             <tr>
                 <td><a href="{% url 'mactaquac:mediafile' mediafile.pk %}">{{ mediafile.item }}</a></td>
                 <td>{{ mediafile.filename }}</td>
-                <td>{{ mediafile.duration_min }}:{{ mediafile.duration_sec }}</td>
+                <td>{{ mediafile.duration_min }}:{% if mediafile.duration_sec < 10 %}0{{ mediafile.duration_sec }}{% else %}{{ mediafile.duration_sec }}{% endif %}</td>
                 <td>{{ mediafile.filesize }}</td>
                 <td>{{ mediafile.item.title }}</td>
                 <td>{{ mediafile.item.collection }}</td>

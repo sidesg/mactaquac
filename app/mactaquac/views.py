@@ -19,10 +19,7 @@ MEDIA_ROOT = "/home/app/web/media"
 
 def index(request):
     return render(request, "mactaquac/home.html")
-
-class MediaFileListView(generic.View):
-    template_name = "mactaquac/filelist.html"
-    
+  
 class MediaFileListView(generic.FormView):
     template_name = "mactaquac/filelist.html"
     
@@ -30,7 +27,7 @@ class MediaFileListView(generic.FormView):
         form = MediaFileSearchForm(self.request.GET or None)
 
         #declare variables for initial landing on list page
-        query_set = MediaFile.objects.all().order_by("item__identifier")
+        query_set = MediaFile.objects.all().order_by("item__identifier", "filename")
         item_identifier = str()
         collection = str()
         title = str()
@@ -56,7 +53,7 @@ class MediaFileListView(generic.FormView):
             audio_codec = request.GET.getlist("audio_codec", None)
             dimensions_width = request.GET.get("dimensions_width", None)
 
-            #Filter query set
+            #Filter query set with search
             if item_identifier:
                 query_set = query_set.filter(item__identifier=item_identifier.strip().upper())
             if collection:
@@ -66,6 +63,7 @@ class MediaFileListView(generic.FormView):
             if filename:
                 query_set = query_set.filter(filename__contains=filename)
 
+            #Make list of filter values before applying the filters
             wrapper_list = Wrapper.objects.filter(id__in=query_set.values("wrapper"))
             vcodec_list = VideoCodec.objects.filter(id__in=query_set.values("videocodec"))
             acodec_list = AudioCodec.objects.filter(id__in=query_set.values("audiocodec"))
@@ -111,6 +109,11 @@ class MediaFileListView(generic.FormView):
 class MediaFileDetailView(generic.DetailView):
     model = MediaFile
     template_name = "mactaquac/mediafile.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # context["duplicates"] = MediaFile.find_duplicates()
+        return context
     
 class MediaFileViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = MediaFileSerializer
