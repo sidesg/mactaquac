@@ -12,8 +12,6 @@ COPY --from=ghcr.io/astral-sh/uv:0.9.8 /uv /uvx /bin/
 # Instal dependancies
 WORKDIR /app
 COPY pyproject.toml uv.lock ./
-# RUN uv sync --frozen --no-dev --python /usr/local/bin/python3 \
-#     && rm -rf /root/.cache/uv
 
 RUN uv sync --frozen --compile-bytecode
 

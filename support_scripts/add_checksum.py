@@ -25,8 +25,6 @@ def main():
     s = requests.Session()
     process_items(ENDPOINT, s)
 
-
-
 def process_items(endpoint: str, session: requests.Session):
     try:
         r = session.get(endpoint)
