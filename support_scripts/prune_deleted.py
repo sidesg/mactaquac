@@ -22,16 +22,21 @@ def main():
         filemode="a",
     )
     session = requests.Session()
+    to_delete = list()
     for fileurl, storage_location in mediafile_generator(ENDPOINT, session):
         if not Path(storage_location).exists():
-            try:
-                r = session.delete(fileurl)
-                if r.status_code == 204:
-                    logging.info(f"no file at {storage_location}; deleted {fileurl}")
-                else:
-                    logging.warning(f"no file at {storage_location}; unable to delete {fileurl};status code {r.status_code}")
-            except Exception as e:
-                logging.warning(f"no file at {storage_location}; unable to delete {fileurl}; {e}")
+            to_delete.append((fileurl, storage_location))
+        
+    for fileurl, storage_location in to_delete:
+        try:
+            r = session.delete(fileurl)
+            if r.status_code == 204:
+                logging.info(f"no file at {storage_location}; deleted entry {fileurl}")
+            else:
+                logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl};status code {r.status_code}")
+        except Exception as e:
+            logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl}; {e}")
+
 
 def mediafile_generator(endpoint: str, session: requests.Session):
     try:

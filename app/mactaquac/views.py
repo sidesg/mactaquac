@@ -77,6 +77,7 @@ class MediaFileListView(generic.FormView):
             if dimensions_width:
                 query_set = query_set.filter(width__gt=dimensions_width)
 
+        total_hits = query_set.count()
         #Set up pagination of query set
         paginator = Paginator(query_set, 25)
         page = request.GET.get('page')
@@ -104,7 +105,7 @@ class MediaFileListView(generic.FormView):
             acodec_list=acodec_list
         )
 
-        return self.render_to_response(self.get_context_data(form=form, mediafiles=query_set, filter_form=filter_form)) 
+        return self.render_to_response(self.get_context_data(form=form, mediafiles=query_set, filter_form=filter_form, hits=total_hits)) 
 
 class MediaFileDetailView(generic.DetailView):
     model = MediaFile
