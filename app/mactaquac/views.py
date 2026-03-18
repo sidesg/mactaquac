@@ -1,24 +1,29 @@
+import os
 from django.shortcuts import render
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, JsonResponse
 from django.views import generic
 from django.core.paginator import Paginator
 from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 
 from rest_framework import viewsets
-
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec
 from .serializers import MediaFileSerializer, ItemSerializer
 from .forms import MediaFileSearchForm, MediaFileFilterForm
+from .tasks import add_files
 
 from pathlib import Path
 
-MEDIA_ROOT = "/home/app/web/media"
+DOCKERMEDIA = os.getenv("DOCKERMEDIA")
 
 def index(request):
     return render(request, "mactaquac/home.html")
+
+def add_new_files(request):
+    result = add_files.delay()
+    return JsonResponse({"message": f"Starting update task {result.task_id}: {result.status}"})
   
 class MediaFileListView(generic.FormView):
     template_name = "mactaquac/filelist.html"
@@ -132,8 +137,8 @@ class ItemViewSetSerialized(viewsets.ModelViewSet):
 
 def download_media(request, filename):
     filepath = MediaFile.objects.get(filename=filename).filepath
-    safe_path: Path = Path(MEDIA_ROOT) / filepath
-    if not str(safe_path).startswith(MEDIA_ROOT):
+    safe_path: Path = Path(DOCKERMEDIA) / filepath
+    if not str(safe_path).startswith(DOCKERMEDIA):
         raise Http404("Invalid file path.")
 
     elif not safe_path.exists():
