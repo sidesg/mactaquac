@@ -119,7 +119,7 @@ def add_item_info(self):
 
 @shared_task(bind=True, track_started=True)
 def add_checksums(self):
-    mediaroot_hexdigest = md5((DOCKERMEDIA).encode()).hexdigest()
+    mediaroot_hexdigest = md5(("checksumscript").encode()).hexdigest()
     lock_id = '{0}-lock-{1}'.format(self.name, mediaroot_hexdigest)
     logging.info("Generating checksums")
     with memcache_lock(lock_id, self.app.oid) as acquired:
@@ -151,7 +151,8 @@ def _make_checksum(filepath) -> str:
 
 @shared_task(bind=True, track_started=True)
 def prune_deleted(self):
-    lock_id = '{0}-lock'.format(self.name)
+    hexdigest = md5(("pruning").encode()).hexdigest()
+    lock_id = '{0}-lock-{1}'.format(self.name, hexdigest)
     logging.info("Pruning deleted files from database")
     with memcache_lock(lock_id, self.app.oid) as acquired:
         if acquired:

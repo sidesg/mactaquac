@@ -64,12 +64,16 @@ services:
     build: 
       context: ./app
       dockerfile: Dockerfile
-    command: uv run celery -A core worker
+    command: >
+      uv run celery -A core worker
+      --loglevel=INFO
+      --logfile=/home/app/web/logs/celery.log
     entrypoint: []
     env_file:
       - .env
     volumes:
       - static_volume:/home/app/web/staticfiles
       - ${MEDIAFOLDER}:${DOCKERMEDIA}
+      - ${LOGFOLDER}:/home/app/web/logs
     depends_on:
       - redis
