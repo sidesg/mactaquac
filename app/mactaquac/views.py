@@ -12,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec
 from .serializers import MediaFileSerializer, ItemSerializer
 from .forms import MediaFileSearchForm, MediaFileFilterForm
-from .tasks import add_files
+from .tasks import add_files, add_item_info, add_checksums, prune_deleted
 
 from pathlib import Path
 
@@ -24,7 +24,19 @@ def index(request):
 def add_new_files(request):
     result = add_files.delay()
     return JsonResponse({"message": f"Starting update task {result.task_id}: {result.status}"})
-  
+
+def new_item_info_view(request):
+    result = add_item_info.delay()
+    return JsonResponse({"message": f"Starting new item info task {result.task_id}: {result.status}"})
+
+def add_checksums_view(request):
+    result = add_checksums.delay()
+    return JsonResponse({"message": f"Starting new checksum task {result.task_id}: {result.status}"})
+
+def prune_deleted_view(request):
+    result = prune_deleted.delay()
+    return JsonResponse({"message": f"Starting new deleted file pruning {result.task_id}: {result.status}"})
+
 class MediaFileListView(generic.FormView):
     template_name = "mactaquac/filelist.html"
     

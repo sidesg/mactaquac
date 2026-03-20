@@ -23,9 +23,10 @@ class MediaFileBuilder():
 
         videocodec, width, height = self._get_videodata()
         duration_mins, duration_secs = self._get_duration()
+        filepath, storage_path = self._make_paths()
 
-        self.filepath = self._get_filepath()
-        self.storage_path = self._make_storage_location()
+        self.filepath = filepath
+        self.storage_path = storage_path
         self.wrapper = self.mediainfo.general_tracks[0].format
         self.videocodec = videocodec
         self.width = width
@@ -37,10 +38,15 @@ class MediaFileBuilder():
         self.seconds = duration_secs
         self.date_added = datetime.date.today().strftime("%Y-%m-%d")
 
-    def _make_storage_location(self):
-        storage = Path(self.absolute_path).relative_to(DOCKERMEDIA)
-        storage = Path(MOUNTED_STORAGE) / storage
-        return storage
+    def _make_paths(self):
+        filepath = Path(self.absolute_path).relative_to(self.watchfolder)
+        storage = Path(MOUNTED_STORAGE) / filepath
+        return filepath, storage
+
+    # def _make_storage_location(self):
+    #     # storage = Path(self.absolute_path).relative_to(DOCKERMEDIA)
+    #     storage = Path(MOUNTED_STORAGE) / self.filepath
+    #     return storage
 
     def _get_item(self) -> str:
         if match := re.match(r"([SVF])(\d+[A-G]?)", self.filename):
@@ -62,9 +68,9 @@ class MediaFileBuilder():
         except:
             raise RuntimeError("mediainfo cannot parse file")
 
-    def _get_filepath(self) -> str:
-        filepath = Path(self.absolute_path).relative_to(self.watchfolder)
-        return filepath
+    # def _get_filepath(self) -> str:
+    #     filepath = Path(self.absolute_path).relative_to(self.watchfolder)
+    #     return filepath
     
     def _get_mediatype(self) -> str:
         if self.mediainfo.video_tracks:
@@ -107,7 +113,9 @@ class MediaFileBuilder():
 
     def _make_checksum(self) -> str:
         hash = hashlib.md5()
-        with open(self.absolute_path, "rb") as file:
+        fullpath = Path(self.absolute_path).relative_to(MOUNTED_STORAGE)
+        fullpath = Path(DOCKERMEDIA)/ fullpath
+        with open(fullpath, "rb") as file:
             while True:
                 data = file.read(65536)
                 if not data:

@@ -25,6 +25,7 @@ ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
 RUN mkdir $APP_HOME
 RUN mkdir $APP_HOME/staticfiles
+RUN mkdir $APP_HOME/logs
 WORKDIR $APP_HOME
 
 COPY --from=base /bin/uv /usr/local/bin/uv

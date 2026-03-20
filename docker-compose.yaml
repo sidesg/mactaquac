@@ -70,6 +70,6 @@ services:
       - .env
     volumes:
       - static_volume:/home/app/web/staticfiles
-      - ${MEDIAFOLDER}:/home/app/web/media
+      - ${MEDIAFOLDER}:${DOCKERMEDIA}
     depends_on:
       - redis
