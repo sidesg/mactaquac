@@ -1,42 +1,32 @@
-FROM python:3.14-slim-trixie AS base
+FROM python:3.13-slim-trixie AS base
 
-# The installer requires curl (and certificates) to download the release archive
-RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates
+ENV UV_NO_DEV=1
+ENV UV_COMPILE_BYTECODE=1
 
-# Instal uv
-ADD https://astral.sh/uv/install.sh /uv-installer.sh
-RUN sh /uv-installer.sh && rm /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
-COPY --from=ghcr.io/astral-sh/uv:0.9.8 /uv /uvx /bin/
+COPY --from=ghcr.io/astral-sh/uv:0.11.0 /uv /uvx /usr/local/bin/
 
-# Instal dependancies
-WORKDIR /app
+WORKDIR /home/app/web
+
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync --frozen --compile-bytecode
+RUN uv sync --locked --no-dev --no-install-project
 
-FROM python:3.14-slim-trixie AS final
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+
+FROM python:3.13-slim-trixie AS final
 
 RUN addgroup --system app && adduser --system --group app
 
-RUN mkdir -p /home/app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
-RUN mkdir $APP_HOME
-RUN mkdir $APP_HOME/staticfiles
-RUN mkdir $APP_HOME/logs
 WORKDIR $APP_HOME
 
-COPY --from=base /bin/uv /usr/local/bin/uv
-COPY --from=base /app/.venv $APP_HOME/.venv
-COPY --from=base /app $APP_HOME
+COPY --from=base /home/app/web $APP_HOME
 
-# Copy the project into the image
-ADD . $APP_HOME
+ENV PATH="$APP_HOME/.venv/bin:/usr/local/bin:/usr/bin:/bin"
+
+COPY . $APP_HOME
 
 RUN chown -R app:app $HOME
 USER app
 
-
-CMD [ "uv", "run", "gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000" ]
+CMD ["gunicorn", "core.wsgi:application", "--bind", "0.0.0.0:8000"]

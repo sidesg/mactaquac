@@ -11,9 +11,9 @@ SQL_HOST=db
 SQL_PORT=5432
 DATABASE=postgres
 
-MEDIAFOLDER=media/file/directory
-LOGFOLDER=/logs
-DOCKERMEDIA=/home/app/web/media
+MEDIAFOLDER=media/file/directory #Local folder where the media files are stored
+LOGFOLDER=/logs #Local folder where the logs will be written
+DOCKERMEDIA=/home/app/web/media #Location of media files in Docker container. DO NOT CHANGE
 
 PGADMIN_DEFAULT_EMAIL=admin@admin.com
 PGADMIN_DEFAULT_PASSWORD=password
