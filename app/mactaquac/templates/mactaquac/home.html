@@ -2,4 +2,10 @@
 {% block title %}Mactaquac homepage{% endblock %}
 {% block content %}
 <p>The Mactaquac Digital Asset Mananagement System is an interface to search for media files based on their metadata.</p>
+<ul>
+    <li><a href="{% url 'mactaquac:add_files' %}">Ingest new files</a></li>
+    <li><a href="{% url 'mactaquac:item_info' %}">Add new item info</a></li>
+    <li><a href="{% url 'mactaquac:add_checksums' %}">Add checksums</a></li>
+    <li><a href="{% url 'mactaquac:prune_deleted' %}">Prune deleted items from database</a></li>
+</ul>
 {% endblock %}

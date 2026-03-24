@@ -2,12 +2,13 @@ volumes:
   postgres_data:
   pgadmin_data:
   static_volume:
+  redis:
 services:
   nginx:
     build: ./nginx
     volumes:
       - static_volume:/home/app/web/staticfiles
-      - ${MEDIAFOLDER}:/home/app/web/media
+      - ${MEDIAFOLDER}:${DOCKERMEDIA}
     ports:
       - 8000:80
     depends_on:
@@ -20,20 +21,11 @@ services:
       - .env
     volumes:
       - static_volume:/home/app/web/staticfiles
-      - ${MEDIAFOLDER}:/home/app/web/media
+      - ${MEDIAFOLDER}:${DOCKERMEDIA}
     expose:
       - 8000
     depends_on:
       - db
-    develop:
-      watch:
-        - action: sync
-          path: .
-          target: ./app
-          ignore:
-            - ./app/.venv/
-        - action: rebuild
-          path: ./app/uv.lock
   db:
     image: postgres:17
     volumes:
@@ -54,3 +46,25 @@ services:
       - 8080:80
     env_file:
       - .env
+  redis:
+    image: "redis:8.6.1-trixie"
+    stop_grace_period: "3s"
+    volumes:
+      - "redis:/data"
+  celery_worker:
+    build: 
+      context: ./app
+      dockerfile: Dockerfile
+    command: >
+      celery -A core worker
+      --loglevel=INFO
+      --logfile=/home/app/web/logs/celery.log
+    entrypoint: []
+    env_file:
+      - .env
+    volumes:
+      - static_volume:/home/app/web/staticfiles
+      - ${MEDIAFOLDER}:${DOCKERMEDIA}
+      - ${LOGFOLDER}:/home/app/web/logs
+    depends_on:
+      - redis

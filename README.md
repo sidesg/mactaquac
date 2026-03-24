@@ -3,4 +3,5 @@ The Mactaquac Digital Asset Management Sysem is a minimal DAMS that indexes medi
 
 The file `.env.example` contains all the variables needed for the production `.env` file.
 
-The directory `support_scripts` contains scripts that will eventually be incorporated into automated background tasks.
+The directory `support_scripts` contains scripts that are now handled through Celery background tasks. However, the directory remains to illustrate how the same tasks can be accomplished by interacting with the API.
+

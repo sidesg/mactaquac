@@ -5,8 +5,7 @@ import os
 from dotenv import load_dotenv
 import datetime
 
-DATAFILE = "../data/SMI_allItems.csv"
-# LOGFOLDER = "../notes/logs"
+DATAFILE = "../app/data/SMI_allItems.csv"
 load_dotenv("../.env")
 LOGFOLDER = os.getenv("LOGFOLDER")
 
