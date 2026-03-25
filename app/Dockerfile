@@ -9,15 +9,18 @@ WORKDIR /home/app/web
 
 COPY pyproject.toml uv.lock ./
 
-RUN uv sync --locked --no-dev --no-install-project
+RUN uv sync --locked --no-install-project
 
 
 FROM python:3.13-slim-trixie AS final
 
 RUN addgroup --system app && adduser --system --group app
 
+RUN mkdir -p /home/app
 ENV HOME=/home/app
 ENV APP_HOME=/home/app/web
+RUN mkdir $APP_HOME
+RUN mkdir $APP_HOME/staticfiles
 WORKDIR $APP_HOME
 
 COPY --from=base /home/app/web $APP_HOME
