@@ -4,7 +4,6 @@ import re
 import shutil
 import logging
 import hashlib
-import os
 import datetime
 from pathlib import Path
 

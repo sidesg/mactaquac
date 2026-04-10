@@ -35,9 +35,9 @@ def add_files(self):
     with memcache_lock(lock_id, self.app.oid) as acquired:
         if acquired:
             analyze_mediafolder(DOCKERMEDIA)
-            logging.info("New file importing complete")
+            logging.info("New file importing complete.")
         else:
-            logging.warning("Mactaquac is already importing new files")
+            logging.warning("Mactaquac is already importing new files. Task aborted.")
 
 def analyze_mediafolder(mediafolder: str):
     for child in Path(mediafolder).iterdir():

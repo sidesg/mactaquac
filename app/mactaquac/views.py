@@ -7,6 +7,8 @@ from django.core.paginator import EmptyPage
 from django.core.paginator import PageNotAnInteger
 
 from rest_framework import viewsets
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
 from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec
@@ -135,12 +137,35 @@ class MediaFileDetailView(generic.DetailView):
     
 class MediaFileViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = MediaFileSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    queryset = MediaFile.objects.all().order_by("id")
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["filename", "item__identifier", "type", "checksum"]
+
+class ReadMediaFileViewSetSerialized(viewsets.ModelViewSet):
+    serializer_class = MediaFileSerializer
+    http_method_names = ['get', 'post', 'head']
+
     queryset = MediaFile.objects.all().order_by("id")
     filter_backends = [DjangoFilterBackend]
     filterset_fields = ["filename", "item__identifier", "type", "checksum"]
 
 class ItemViewSetSerialized(viewsets.ModelViewSet):
     serializer_class = ItemSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Item.objects.all().order_by("identifier")
+    lookup_field = "identifier"
+
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["identifier", "collection", "updated"]
+
+class ReadItemViewSetSerialized(viewsets.ModelViewSet):
+    serializer_class = ItemSerializer
+    http_method_names = ['get', 'post', 'head']
+    
     queryset = Item.objects.all().order_by("identifier")
     lookup_field = "identifier"
 

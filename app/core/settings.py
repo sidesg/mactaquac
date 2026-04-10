@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.postgres",
     "mactaquac",
     "rest_framework",
+    "rest_framework.authtoken",
     "django_filters"
 ]
 
@@ -150,7 +151,11 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 100
+    'PAGE_SIZE': 100,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ]
 }
 
 REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")

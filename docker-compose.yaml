@@ -67,4 +67,5 @@ services:
       - ${MEDIAFOLDER}:${DOCKERMEDIA}
       - ${LOGFOLDER}:/home/app/web/logs
     depends_on:
+      - db
       - redis

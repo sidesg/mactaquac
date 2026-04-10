@@ -8,6 +8,7 @@ import datetime
 DATAFILE = "../app/data/SMI_allItems.csv"
 load_dotenv("../.env")
 LOGFOLDER = os.getenv("LOGFOLDER")
+TOKEN = "7d6fbda800a8525c93d868d76bdbd1699be37fab"
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")
@@ -26,11 +27,12 @@ def main():
         columns=["Identifier", "StrTitle", "Collection"]
     )
 
-    s = requests.Session()
-    items_to_mactaquac(
-        "http://localhost/mactaquac/api/item/",
-        df, s
-    )
+    with requests.Session() as s:
+        s.headers.update({"Token": TOKEN})
+        items_to_mactaquac(
+            "http://localhost/mactaquac/api/item/",
+            df, s
+        )
 
 def items_to_mactaquac(endpoint: str, df: pl.DataFrame, session: requests.Session):
     r = session.get(endpoint)

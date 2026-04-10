@@ -9,6 +9,7 @@ load_dotenv("../.env")
 LOGFOLDER = os.getenv("LOGFOLDER")
 MEDIAROOT = os.getenv("MEDIAFOLDER")
 ENDPOINT = "http://localhost/mactaquac/api/mediafile/"
+TOKEN = "7d6fbda800a8525c93d868d76bdbd1699be37fab"
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")
@@ -21,21 +22,22 @@ def main():
         encoding="utf-8",
         filemode="a",
     )
-    session = requests.Session()
-    to_delete = list()
-    for fileurl, storage_location in mediafile_generator(ENDPOINT, session):
-        if not Path(storage_location).exists():
-            to_delete.append((fileurl, storage_location))
-        
-    for fileurl, storage_location in to_delete:
-        try:
-            r = session.delete(fileurl)
-            if r.status_code == 204:
-                logging.info(f"no file at {storage_location}; deleted entry {fileurl}")
-            else:
-                logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl};status code {r.status_code}")
-        except Exception as e:
-            logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl}; {e}")
+    with requests.Session() as session:
+        session.headers.update({"Token": TOKEN})
+        to_delete = list()
+        for fileurl, storage_location in mediafile_generator(ENDPOINT, session):
+            if not Path(storage_location).exists():
+                to_delete.append((fileurl, storage_location))
+            
+        for fileurl, storage_location in to_delete:
+            try:
+                r = session.delete(fileurl)
+                if r.status_code == 204:
+                    logging.info(f"no file at {storage_location}; deleted entry {fileurl}")
+                else:
+                    logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl};status code {r.status_code}")
+            except Exception as e:
+                logging.warning(f"no file at {storage_location}; unable to delete entry {fileurl}; {e}")
 
 
 def mediafile_generator(endpoint: str, session: requests.Session):

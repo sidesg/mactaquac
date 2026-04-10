@@ -1,12 +1,15 @@
 from django.urls import path, include
 from rest_framework import routers
+from rest_framework.authtoken import views as rfviews
 from . import views
 
 app_name = "mactaquac"
 
 router = routers.DefaultRouter()
 router.register(r"mediafile", views.MediaFileViewSetSerialized)
+router.register(r"mediafile_view", views.ReadMediaFileViewSetSerialized, "mediafile_view")
 router.register(r"item", views.ItemViewSetSerialized)
+router.register(r"item_view", views.ReadItemViewSetSerialized, "item_view")
 
 urlpatterns = [
     path("", views.index, name="index"),
@@ -18,4 +21,5 @@ urlpatterns = [
     path("item_info/", views.new_item_info_view, name="item_info"),
     path("add_checksums/", views.add_checksums_view, name="add_checksums"),
     path("prune_deleted/", views.prune_deleted_view, name="prune_deleted"),
+    path('api-token-auth/', rfviews.obtain_auth_token)
 ]

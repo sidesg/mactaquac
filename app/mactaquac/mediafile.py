@@ -43,11 +43,6 @@ class MediaFileBuilder():
         storage = Path(MOUNTED_STORAGE) / filepath
         return filepath, storage
 
-    # def _make_storage_location(self):
-    #     # storage = Path(self.absolute_path).relative_to(DOCKERMEDIA)
-    #     storage = Path(MOUNTED_STORAGE) / self.filepath
-    #     return storage
-
     def _get_item(self) -> str:
         if match := re.match(r"([SVF])(\d+[A-G]?)", self.filename):
             prefix = match.group(1)
@@ -67,10 +62,6 @@ class MediaFileBuilder():
             return MediaInfo.parse(self.absolute_path)
         except:
             raise RuntimeError("mediainfo cannot parse file")
-
-    # def _get_filepath(self) -> str:
-    #     filepath = Path(self.absolute_path).relative_to(self.watchfolder)
-    #     return filepath
     
     def _get_mediatype(self) -> str:
         if self.mediainfo.video_tracks:
@@ -78,20 +69,19 @@ class MediaFileBuilder():
         elif self.mediainfo.audio_tracks:
             return "audio"
         else:
-            # return "textual"
             raise RuntimeError("no parsable video or audio streams")
     
     def _get_videodata(self):
         if videotracks := self.mediainfo.video_tracks:
             return videotracks[0].format, videotracks[0].width, videotracks[0].height
         else:
-            return "No Image", None, None
+            return None, None, None
     
     def _get_audiocodec(self):
         if audiotracks := self.mediainfo.audio_tracks:
             return audiotracks[0].format
         else:
-            return "No Sound"
+            return None
 
     def _get_creation_date(self):
         if datetime := self.mediainfo.general_tracks[0].encoded_date:

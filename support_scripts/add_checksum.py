@@ -9,6 +9,7 @@ load_dotenv("../.env")
 LOGFOLDER = os.getenv("LOGFOLDER")
 MEDIAROOT = os.getenv("MEDIAFOLDER")
 ENDPOINT = "http://localhost/mactaquac/api/mediafile/"
+TOKEN = "7d6fbda800a8525c93d868d76bdbd1699be37fab"
 
 def main():
     now = datetime.datetime.now().strftime("%Y%m%d")
@@ -22,8 +23,9 @@ def main():
         filemode="a",
     )
 
-    s = requests.Session()
-    process_items(ENDPOINT, s)
+    with requests.Session() as s:
+        s.headers.update({"Token": TOKEN})
+        process_items(ENDPOINT, s)
 
 def process_items(endpoint: str, session: requests.Session):
     try:
@@ -61,7 +63,8 @@ def process_items(endpoint: str, session: requests.Session):
                         data={
                             "checksum": checksum,
                             "date_modified": datetime.date.today().strftime("%Y-%m-%d"),
-                        }
+                        },
+                        headers={"Token": TOKEN}
                     )
                     if r.status_code == 200:
                         logging.info(f"updated {filename}")
