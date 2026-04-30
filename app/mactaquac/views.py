@@ -2,9 +2,7 @@ import os
 from django.shortcuts import render
 from django.http import HttpResponse, Http404, JsonResponse
 from django.views import generic
-from django.core.paginator import Paginator
-from django.core.paginator import EmptyPage
-from django.core.paginator import PageNotAnInteger
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
@@ -14,7 +12,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec
 from .serializers import MediaFileSerializer, ItemSerializer
 from .forms import MediaFileSearchForm, MediaFileFilterForm
-from .tasks import add_files, add_item_info, add_checksums, prune_deleted
+from .tasks import add_files, add_item_info, add_checksums, prune_deleted, validate_filename
 
 from pathlib import Path
 
@@ -190,4 +188,14 @@ def download_media(request, filename):
         response['X-Accel-Redirect'] = f"/media/{filepath}"
 
         return response
-    
+
+def download_media_background_view(request, filename):
+    if filepath := validate_filename.delay(filename):
+        response = HttpResponse()
+        response['Content-Type'] = 'application/octet-stream'
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+
+        # This tells Nginx to serve the file
+        response['X-Accel-Redirect'] = f"/media/{filepath}"
+
+        return response        

@@ -8,6 +8,7 @@ from celery import shared_task
 from pathlib import Path
 from contextlib import contextmanager
 from django.core.cache import cache
+from django.http import Http404
 from hashlib import md5
 
 from .models import MediaFile, Wrapper, AudioCodec, VideoCodec, Item
@@ -54,8 +55,14 @@ def analyze_mediafolder(mediafolder: str):
             else:
                 try:
                     wrapper,_=Wrapper.objects.get_or_create(name=file.wrapper)
-                    videocodec,_=VideoCodec.objects.get_or_create(name=file.videocodec)
-                    audiocodec,_=AudioCodec.objects.get_or_create(name=file.audiocodec)
+                    if file.videocodec:
+                        videocodec,_=VideoCodec.objects.get_or_create(name=file.videocodec)
+                    else:
+                        videocodec=VideoCodec.get_default()
+                    if file.audiocodec:
+                        audiocodec,_=AudioCodec.objects.get_or_create(name=file.audiocodec)
+                    else:
+                        audiocodec=AudioCodec.get_default()
                     item,_=Item.objects.get_or_create(identifier=file.item)
 
                     MediaFile.objects.create(
@@ -170,3 +177,15 @@ def prune_deleted(self):
             logging.debug("Deleted files pruned")
         else:
             logging.warning("Mactaquac is already pruning deleted files")
+
+@shared_task
+def validate_filename(filename):
+    filepath = MediaFile.objects.get(filename=filename).filepath
+    safe_path: Path = Path(DOCKERMEDIA) / filepath
+    if not str(safe_path).startswith(DOCKERMEDIA):
+        raise Http404("Invalid file path.")
+
+    elif not safe_path.exists():
+        raise Http404("File not found.")
+    else:
+        return filepath

@@ -13,6 +13,7 @@ services:
       - 8000:80
     depends_on:
       - web
+      - celery_worker
   web:
     build: 
       context: ./app

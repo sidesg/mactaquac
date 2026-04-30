@@ -22,11 +22,11 @@ class VideoCodec(models.Model):
     notes = models.TextField(null=True, blank=True)
 
     @classmethod
-    def get_default_pk(cls):
+    def get_default(cls):
         codec, _ = cls.objects.get_or_create(
             name='No Image'
         )
-        return codec.pk
+        return codec
 
     def __str__(self):
         return self.name
@@ -36,11 +36,11 @@ class AudioCodec(models.Model):
     notes = models.TextField(null=True, blank=True)
 
     @classmethod
-    def get_default_pk(cls):
+    def get_default(cls):
         codec, _ = cls.objects.get_or_create(
             name='No Sound'
         )
-        return codec.pk
+        return codec
 
     def __str__(self):
         return self.name
@@ -51,14 +51,30 @@ class MediaFile(models.Model):
         "video": "video",
         "textual": "textual"
     }
-    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name="mediafiles")
+    item = models.ForeignKey(
+        Item, 
+        on_delete=models.CASCADE, 
+        related_name="mediafiles"
+    )
     type = models.CharField(max_length=255, choices=TYPES)
     filename = models.CharField(unique=True)
     filepath = models.CharField(unique=True)
     storage_location = models.CharField()
-    wrapper = models.ForeignKey(Wrapper, on_delete=models.SET_NULL, null=True, blank=True)
-    videocodec = models.ForeignKey(VideoCodec, on_delete=models.SET_DEFAULT, default=VideoCodec.get_default_pk())
-    audiocodec = models.ForeignKey(AudioCodec, on_delete=models.SET_DEFAULT, default=AudioCodec.get_default_pk())
+    wrapper = models.ForeignKey(
+        Wrapper, 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True
+    )
+    videocodec = models.ForeignKey(
+        VideoCodec, on_delete=models.SET_DEFAULT, 
+        default=VideoCodec.get_default().pk, 
+    )
+    audiocodec = models.ForeignKey(
+        AudioCodec, 
+        on_delete=models.SET_DEFAULT, 
+        default=AudioCodec.get_default().pk, 
+    )
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
     checksum = models.CharField(null=True, blank=True)
