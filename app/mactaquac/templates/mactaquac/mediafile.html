@@ -14,6 +14,20 @@
     {% endif %}
 </ul>
 
+{% if mediafile.type == "video" %}
+<div>
+    <video controls width="800">
+        <source src="{% url 'mactaquac:download_media' mediafile.filename %}" type="video/mp4">
+    </video>
+</div>
+{% endif %}
+
+{% if mediafile.type == "audio" %}
+<div>
+    <audio controls src="{% url 'mactaquac:download_media' mediafile.filename %}"></audio>
+</div>
+{% endif %}
+
 <div>
     <h2>Item information</h2>
     <ul>
