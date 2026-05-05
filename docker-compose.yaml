@@ -10,7 +10,7 @@ services:
       - static_volume:/home/app/web/staticfiles
       - ${MEDIAFOLDER}:${DOCKERMEDIA}
     ports:
-      - 8000:80
+      - 80:80
     depends_on:
       - web
       - celery_worker
