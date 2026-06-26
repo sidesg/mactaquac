@@ -1,0 +1,53 @@
+{% extends "mactaquac/base.html" %}
+{% block title %}Mactaquac DAMS: Accession {{ accession.identifier }}{% endblock %}
+{% block content %}
+
+{% if accession %}
+
+<div>
+    <h1>{{ accession.identifier }}</h1>
+</div>
+
+{% if mediafiles %}
+<div>
+    <table>
+        <tr>
+            <th>Item ID</th>
+            <th>Filename</th>
+            <th>Duration</th>
+            <th>Size (MB)</th>
+            <th>Item title</th>
+            <th>Collection</th>
+            <th>Wrapper</th>
+            <th>Video codec</th>
+            <th>Audio codec</th>
+            <th>Resolution</th>
+            <th>Created</th>
+            <th>Download</th>
+        </tr>
+        {% for mediafile in mediafiles %}
+        <tr>
+            <td><a href="{% url 'mactaquac:mediafile' mediafile.pk %}">{{ mediafile.item }}</a></td>
+            <td>{{ mediafile.filename }}</td>
+            <td>{{ mediafile.duration_min }}:{% if mediafile.duration_sec < 10 %}0{{ mediafile.duration_sec }}{% else %}{{ mediafile.duration_sec }}{% endif %}</td>
+            <td>{{ mediafile.filesize }}</td>
+            <td>{{ mediafile.item.title }}</td>
+            <td>{{ mediafile.item.collection }}</td>
+            <td>{{ mediafile.wrapper }}</td>
+            <td>{{ mediafile.videocodec }}</td>
+            <td>{{ mediafile.audiocodec }}</td>
+            <td>{{ mediafile.width }} x {{ mediafile.height }}</td>
+            <td>{{ mediafile.creation_date|date:"Y-m-d" }}</td>
+            <td><a href="{% url 'mactaquac:download_media' mediafile.filename %}">download</a></td>
+        </tr>
+        {% endfor %}
+    </table>    
+</div>
+{% endif %}
+    
+{% else %}
+
+<p>Accession does not exist.</p>
+
+{% endif %}
+{% endblock %}

@@ -26,6 +26,7 @@
                 <th>Size (MB)</th>
                 <th>Item title</th>
                 <th>Collection</th>
+                <th>Accession</th>
                 <th>Wrapper</th>
                 <th>Video codec</th>
                 <th>Audio codec</th>
@@ -41,6 +42,7 @@
                 <td>{{ mediafile.filesize }}</td>
                 <td>{{ mediafile.item.title }}</td>
                 <td>{{ mediafile.item.collection }}</td>
+                <td><a href="{% url 'mactaquac:accession' mediafile.item.accession.pk %}">{{ mediafile.item.accession }}</a></td>
                 <td>{{ mediafile.wrapper }}</td>
                 <td>{{ mediafile.videocodec }}</td>
                 <td>{{ mediafile.audiocodec }}</td>

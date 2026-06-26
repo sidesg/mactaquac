@@ -9,7 +9,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
-from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec
+from .models import MediaFile, Item, Wrapper, VideoCodec, AudioCodec, Accession
 from .serializers import MediaFileSerializer, ItemSerializer
 from .forms import MediaFileSearchForm, MediaFileFilterForm
 from .tasks import add_files, add_item_info, add_checksums, prune_deleted, validate_filename
@@ -47,6 +47,7 @@ class MediaFileListView(generic.FormView):
         query_set = MediaFile.objects.all().order_by("item__identifier", "filename")
         item_identifier = str()
         collection = str()
+        accession = str()
         title = str()
         filename = str()
         media_wrapper = None
@@ -63,6 +64,7 @@ class MediaFileListView(generic.FormView):
             #Get data from request
             item_identifier = request.GET.get("item_identifier")
             collection = request.GET.get("collection")
+            accession = request.GET.get("accession")
             title = request.GET.get("title")
             filename = request.GET.get("filename")
             media_wrapper = request.GET.getlist("media_wrapper", None)
@@ -75,6 +77,8 @@ class MediaFileListView(generic.FormView):
                 query_set = query_set.filter(item__identifier=item_identifier.strip().upper())
             if collection:
                 query_set = query_set.filter(item__collection=collection.strip().upper())
+            if accession:
+                query_set = query_set.filter(item__accession__identifier=accession.strip().upper())
             if title:
                 query_set = query_set.filter(item__title__contains=title.strip())
             if filename:
@@ -92,7 +96,7 @@ class MediaFileListView(generic.FormView):
             if audio_codec:
                 query_set = query_set.filter(audiocodec__name__in=audio_codec)
             if dimensions_width:
-                query_set = query_set.filter(width__gt=dimensions_width)
+                query_set = query_set.filter(width__gte=dimensions_width)
 
         total_hits = query_set.count()
         #Set up pagination of query set
@@ -114,6 +118,7 @@ class MediaFileListView(generic.FormView):
                 "dimensions_width": dimensions_width if dimensions_width else None,
                 "item_identifier": item_identifier if item_identifier else None,
                 "collection": collection if collection else None,
+                "accession": accession if accession else None,
                 "title": title if title else None,
                 "filename": filename if filename else None
             },
@@ -199,3 +204,17 @@ def download_media_background_view(request, filename):
         response['X-Accel-Redirect'] = f"/media/{filepath}"
 
         return response        
+
+class AccessionDetailView(generic.DetailView):
+    model = Accession
+    template_name = "mactaquac/accession.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context["mediafiles"] = MediaFile.objects.filter(
+            item__accession__pk=self.kwargs['pk']
+        )
+
+        return context
+    

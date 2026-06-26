@@ -11,7 +11,7 @@ from django.core.cache import cache
 from django.http import Http404
 from hashlib import md5
 
-from .models import MediaFile, Wrapper, AudioCodec, VideoCodec, Item
+from .models import MediaFile, Wrapper, AudioCodec, VideoCodec, Item, Accession
 from .mediafile import MediaFileBuilder
 
 DOCKERMEDIA = os.getenv("DOCKERMEDIA")
@@ -100,17 +100,21 @@ def add_item_info(self):
                 df = pl.read_csv(
                     DATAFILE, 
                     encoding="windows-1252",
-                    columns=["Identifier", "StrTitle", "Collection"]
+                    columns=["Identifier", "StrTitle", "Collection", "AccessionNumber"]
                 )
                 for item in items:
                     try:
                         dff = df.filter(pl.col("Identifier") == item.identifier)
                         if len(dff) > 0:
                             title = dff.get_column('StrTitle')[0]
+                            accession = dff.get_column('AccessionNumber')[0]
                             collection = dff.get_column('Collection')[0]
 
                             item.collection = collection
                             item.title = title if title else "[NO TITLE]"
+                            if accession:
+                                accession_id,_=Accession.objects.get_or_create(identifier=accession)
+                                item.accession = accession_id
                             item.updated = True
                             item.save()
                             logging.info(f"Updated {item.identifier}")
@@ -155,7 +159,7 @@ def _make_checksum(filepath) -> str:
                 break
             hash.update(data)
     return hash.hexdigest()
-
+max_length=50
 @shared_task(bind=True, track_started=True)
 def prune_deleted(self):
     hexdigest = md5(("pruning").encode()).hexdigest()
@@ -177,6 +181,25 @@ def prune_deleted(self):
             logging.debug("Deleted files pruned")
         else:
             logging.warning("Mactaquac is already pruning deleted files")
+
+@shared_task
+def update_tech_info(id):
+    if mediafile := MediaFile.objects.get(id=id):
+        ...
+    else:
+        ...
+
+@shared_task
+def update_all_tech_info(self):
+    hexdigest = md5(("tech").encode()).hexdigest()
+    lock_id = '{0}-lock-{1}'.format(self.name, hexdigest)
+    logging.info("Updating all technical metadata")
+    with memcache_lock(lock_id, self.app.oid) as acquired:
+        if acquired:
+            for mediafile in MediaFile.objects.all():
+                ...
+        else:
+            logging.warning("Mactaquac is already updating all technical metadata")    
 
 @shared_task
 def validate_filename(filename):

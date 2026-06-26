@@ -1,4 +1,5 @@
-p, li {
+p,
+li {
     font-family: "Ungkam", Times, serif;
 }
 
@@ -47,11 +48,11 @@ p, li {
     justify-content: space-between;
     height: auto;
 }
-  
+
 .main {
-    padding: 12px; 
-    width: 90%; 
-    height: auto; 
+    padding: 12px;
+    width: 90%;
+    height: auto;
 }
 
 .sidebar {
@@ -68,7 +69,7 @@ p, li {
     margin: 5;
     padding: 10;
     overflow: hidden;
-  }
+}
 
 .lem_init label {
     float: left;
@@ -76,4 +77,21 @@ p, li {
 
 .pagination {
     text-align: center;
+}
+
+dt {
+    float: left;
+    clear: left;
+    text-align: right;
+    font-weight: bold;
+    color: black;
+}
+
+dt::after {
+    content: ": ";
+}
+
+dd {
+    margin: 0 0 0 200px;
+    padding: 0 0 0.5em 0;
 }
