@@ -42,7 +42,11 @@
                 <td>{{ mediafile.filesize }}</td>
                 <td>{{ mediafile.item.title }}</td>
                 <td>{{ mediafile.item.collection }}</td>
+                {% if mediafile.item.accession %}
                 <td><a href="{% url 'mactaquac:accession' mediafile.item.accession.pk %}">{{ mediafile.item.accession }}</a></td>
+                {% else %}
+                <td></td>
+                {% endif %}
                 <td>{{ mediafile.wrapper }}</td>
                 <td>{{ mediafile.videocodec }}</td>
                 <td>{{ mediafile.audiocodec }}</td>

@@ -142,6 +142,7 @@ def add_checksums(self):
                         checksum = _make_checksum(fullpath)
                         file.checksum = checksum
                         file.save()
+                        logging.info(f"Checksum generated for {file.filename}")
                     except Exception as e:
                         logging.warning(f"Unable to make checksum for {file.filename}: {e}")
             else:

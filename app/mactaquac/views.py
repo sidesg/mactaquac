@@ -80,9 +80,9 @@ class MediaFileListView(generic.FormView):
             if accession:
                 query_set = query_set.filter(item__accession__identifier=accession.strip().upper())
             if title:
-                query_set = query_set.filter(item__title__contains=title.strip())
+                query_set = query_set.filter(item__title__icontains=title.strip())
             if filename:
-                query_set = query_set.filter(filename__contains=filename)
+                query_set = query_set.filter(filename__icontains=filename.strip())
 
             #Make list of filter values before applying the filters
             wrapper_list = Wrapper.objects.filter(id__in=query_set.values("wrapper"))
