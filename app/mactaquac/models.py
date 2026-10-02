@@ -39,7 +39,7 @@ class VideoCodec(models.Model):
     def get_default(cls):
         codec, _ = cls.objects.get_or_create(
             name='No Image'
-        )
+        )[0].pk
         return codec
 
     def __str__(self):
@@ -53,7 +53,7 @@ class AudioCodec(models.Model):
     def get_default(cls):
         codec, _ = cls.objects.get_or_create(
             name='No Sound'
-        )
+        )[0].pk
         return codec
 
     def __str__(self):
@@ -81,13 +81,13 @@ class MediaFile(models.Model):
         blank=True
     )
     videocodec = models.ForeignKey(
-        VideoCodec, on_delete=models.SET_DEFAULT, 
-        default=VideoCodec.get_default().pk, 
+        VideoCodec, on_delete=models.PROTECT, 
+        default=VideoCodec.get_default, 
     )
     audiocodec = models.ForeignKey(
         AudioCodec, 
-        on_delete=models.SET_DEFAULT, 
-        default=AudioCodec.get_default().pk, 
+        on_delete=models.PROTECT, 
+        default=AudioCodec.get_default, 
     )
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
